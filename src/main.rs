@@ -1,21 +1,26 @@
 use chrono::prelude::*;
 use serde::{Deserialize, Serialize};
-use std::io::Write;
 use std::io::{BufRead, BufReader, Error, ErrorKind};
 use std::process::{Command, Stdio};
-use std::{fs::File, path::Path};
+use std::{
+    fs::File,
+    path::Path,
+    time::{Duration, Instant},
+};
 
 #[derive(Serialize, Deserialize, Debug)]
 struct Log {
     time: DateTime<Utc>,
-    text: String,
+    log_msg: String,
+    duration: Duration,
 }
 
 impl Log {
-    fn new(s: &str) -> Self {
+    fn new(s: &str, d: Duration) -> Self {
         Log {
             time: Utc::now(),
-            text: s.to_string(),
+            log_msg: s.to_string(),
+            duration: d,
         }
     }
 }
