@@ -39,23 +39,29 @@ pub fn exec_stream(disk: &str, seed: &str, file: &mut File) {
         .spawn()
         .unwrap();
 
+    let mut base_time = Instant::now();
+
     let mut data = vec![];
     {
-        let stdout = cmd.stdout.as_mut().unwrap();
+        let stdout = cmd.stdout.take().unwrap();
         let stdout_reader = BufReader::new(stdout);
         let stdout_lines = stdout_reader.lines();
 
         for line in stdout_lines {
-            data.push(Log::new(&line.unwrap()));
+            let l = line.unwrap();
+            let duration = base_time.elapsed();
+            base_time = Instant::now();
+            data.push(Log::new(&l, duration));
+
+            if l.contains("ubuntu login:") {
+                //todo: return the stdout
+                cmd.kill().expect("failed");
+            }
         }
     }
 
     cmd.wait().unwrap();
-
-    // write log
-    for i in &data {
-        file.write_all(format!("{}", serde_json::to_string(i).unwrap()).as_bytes());
-    }
+    serde_json::to_writer(file, &data);
 }
 
 fn main() {
