@@ -70,7 +70,7 @@ fn main() {
     let disk_path = Path::new(&disk);
     let file_name = disk_path.file_name().unwrap();
 
-    let path: String = format!("/output/build-{:?}-{}.csv", file_name, Utc::now());
+    let path: String = format!("output/build-{:?}-{}.json", file_name, Utc::now());
     let mut log_file = File::create(&path).expect("unable to create file");
 
     exec_stream(&disk, &seed, &mut log_file);
