@@ -5,7 +5,7 @@ use std::process::{Command, Stdio};
 use std::{
     fs::File,
     path::Path,
-    time::{Duration, Instant},
+    time::{Duration, Instant, SystemTime, UNIX_EPOCH},
 };
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -73,5 +73,10 @@ fn main() {
     let path: String = format!("output/build-{:?}-{}.json", file_name, Utc::now());
     let mut log_file = File::create(&path).expect("unable to create file");
 
+    let start = Instant::now();
+    println!("started ....");
     exec_stream(&disk, &seed, &mut log_file);
+
+    let duration = start.elapsed();
+    println!("Time elapsed is: {:?}", duration);
 }
