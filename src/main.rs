@@ -1,11 +1,11 @@
 use chrono::prelude::*;
 use serde::{Deserialize, Serialize};
-use std::io::{BufRead, BufReader, BufWriter, Write};
+use std::io::{BufRead, BufReader};
 use std::process::{Command, Stdio};
 use std::{
     fs::File,
     path::Path,
-    time::{Duration, Instant, SystemTime, UNIX_EPOCH},
+    time::{Duration, Instant},
 };
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -29,8 +29,8 @@ pub fn exec_stream(disk: &str, seed: &str, file: &mut File) {
     let comm = "qemu-system-x86_64";
     let mut cmd = Command::new(comm)
         .arg("-enable-kvm")
-        .args(["-drive", &format!("file={},if=virtio", disk)])
-        .args(["-drive", &format!("file={},if=virtio,format=raw", seed)])
+        .args(["-drive", &format!("file={disk},if=virtio")])
+        .args(["-drive", &format!("file={seed},if=virtio,format=raw")])
         .args(["-device", "virtio-net-pci,netdev=net00"])
         .args(["-netdev", "type=user,id=net00"])
         .args(["-m", "512"])
@@ -71,12 +71,12 @@ fn main() {
     let file_name = disk_path.file_name().unwrap();
 
     let path: String = format!("output/build-{:?}-{}.json", file_name, Utc::now());
-    let mut log_file = File::create(&path).expect("unable to create file");
+    let mut log_file = File::create(path).expect("unable to create file");
 
     let start = Instant::now();
     println!("started ....");
     exec_stream(&disk, &seed, &mut log_file);
 
     let duration = start.elapsed();
-    println!("Time elapsed is: {:?}", duration);
+    println!("Time elapsed is: {duration:?}");
 }
