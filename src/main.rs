@@ -1,6 +1,6 @@
 use chrono::prelude::*;
 use serde::{Deserialize, Serialize};
-use std::io::{BufRead, BufReader, Error, ErrorKind};
+use std::io::{BufRead, BufReader, BufWriter, Write};
 use std::process::{Command, Stdio};
 use std::{
     fs::File,
@@ -35,12 +35,12 @@ pub fn exec_stream(disk: &str, seed: &str, file: &mut File) {
         .args(["-netdev", "type=user,id=net00"])
         .args(["-m", "512"])
         .arg("-nographic")
+        .stdin(Stdio::piped())
         .stdout(Stdio::piped())
         .spawn()
         .unwrap();
 
     let mut base_time = Instant::now();
-
     let mut data = vec![];
     {
         let stdout = cmd.stdout.take().unwrap();
@@ -52,9 +52,9 @@ pub fn exec_stream(disk: &str, seed: &str, file: &mut File) {
             let duration = base_time.elapsed();
             base_time = Instant::now();
             data.push(Log::new(&l, duration));
-
-            if l.contains("ubuntu login:") {
-                //todo: return the stdout
+            //
+            //the closest to kill switch
+            if l.contains("Ubuntu 22.04.1 LTS ubuntu ttyS0") {
                 cmd.kill().expect("failed");
             }
         }
