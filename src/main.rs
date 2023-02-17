@@ -54,7 +54,7 @@ pub fn exec_stream(disk: &str, seed: &str, file: &mut File) {
             data.push(Log::new(&l, duration));
             //
             //the closest to kill switch
-            if l.contains("Ubuntu 22.04.1 LTS ubuntu ttyS0") {
+            if l.contains("Ubuntu ") && l.contains(" LTS ubuntu ttyS0") {
                 cmd.kill().expect("failed");
             }
         }
