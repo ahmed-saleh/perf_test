@@ -1,7 +1,6 @@
-use tokio::net::TcpStream;
-
 use chrono::prelude::*;
 use serde::{Deserialize, Serialize};
+use ssh2::Session;
 use std::io::{BufRead, BufReader};
 use std::process::{Command, Stdio};
 use std::{
@@ -11,6 +10,7 @@ use std::{
     thread,
     time::{Duration, Instant},
 };
+use tokio::net::TcpStream;
 
 #[derive(Serialize, Deserialize, Debug)]
 struct Log {
@@ -42,7 +42,13 @@ fn connect_to_ssh() -> Result<&'static str, &'static str> {
 
 #[tokio::main]
 async fn caller() -> Result<(), Box<dyn Error>> {
-    let conn = TcpStream::connect("127.0.0.1:2222").await?;
+    let tcp = TcpStream::connect("127.0.0.1:2222").await?;
+    println!("waiting for session");
+    let mut sess = Session::new().unwrap();
+    sess.set_tcp_stream(tcp);
+    println!("waiting for handshake");
+    sess.handshake().unwrap();
+
     Ok(())
 }
 
