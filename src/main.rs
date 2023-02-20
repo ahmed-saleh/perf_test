@@ -34,7 +34,6 @@ fn connect_to_ssh() -> Result<&'static str, &'static str> {
         if caller().is_ok() {
             return Ok("connected");
         }
-        println!("we sleeping");
         std::thread::sleep(Duration::from_millis(500));
     }
     Err("error")
@@ -47,12 +46,11 @@ async fn caller() -> Result<(), Box<dyn Error>> {
     let mut sess = Session::new().unwrap();
     sess.set_tcp_stream(tcp);
     println!("waiting for handshake");
-    sess.handshake().unwrap();
-
+    let s = sess.handshake().unwrap();
+    //   sess.userauth_password("ubuntu", "pass").unwrap();
     Ok(())
 }
 
-// -netdev user,id=net00,hostfwd=tcp::2222-:22 -device virtio-net-pci,netdev=net00
 fn exec_stream(
     disk: &str,
     seed: &str,
