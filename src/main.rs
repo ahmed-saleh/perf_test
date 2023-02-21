@@ -112,13 +112,14 @@ fn main() {
     println!("started ....");
     let cmd = exec_stream(&disk, &seed, &mut log_file);
     println!("about to ssh");
-
-    match connect_to_ssh() {
-        Ok(t) => {
-            println!("connected at {:?}", t)
+    /*
+        match connect_to_ssh() {
+            Ok(t) => {
+                println!("connected at {:?}", t)
+            }
+            Err(e) => println!("error: {}", e),
         }
-        Err(e) => println!("error: {}", e),
-    }
+    */
     cmd.unwrap().kill();
     let duration = start.elapsed();
     println!("Time elapsed is: {duration:?}");
