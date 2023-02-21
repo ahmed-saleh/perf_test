@@ -70,33 +70,30 @@ fn exec_stream(
         .spawn()
         .unwrap();
 
-    Ok(cmd)
-    /*
-        let mut base_time = Instant::now();
-        let mut data = vec![];
-        {
-            let stdout = cmd.stdout.take().unwrap();
-            let stdout_reader = BufReader::new(stdout);
-            let stdout_lines = stdout_reader.lines();
+    let mut base_time = Instant::now();
+    let mut data = vec![];
+    {
+        let stdout = cmd.stdout.take().unwrap();
+        let stdout_reader = BufReader::new(stdout);
+        let stdout_lines = stdout_reader.lines();
 
-
-            for line in stdout_lines {
-                let l = line.unwrap();
-                let duration = base_time.elapsed();
-                base_time = Instant::now();
-                data.push(Log::new(&l, duration));
-                //
-                //the closest to kill switch
-                println!("{}", l);
-                if l.contains("break----here ttyS0") {
-                    cmd.kill().expect("failed");
-                }
+        for line in stdout_lines {
+            let l = line.unwrap();
+            let duration = base_time.elapsed();
+            base_time = Instant::now();
+            data.push(Log::new(&l, duration));
+            //
+            //the closest to kill switch
+            println!("{}", l);
+            if l.contains("ubuntu login:") {
+                cmd.kill().expect("failed");
             }
         }
+    }
 
-        cmd.wait().unwrap();
-        serde_json::to_writer(file, &data);
-    */
+    cmd.wait().unwrap();
+    serde_json::to_writer(file, &data);
+    Ok(cmd)
 }
 
 fn main() {
